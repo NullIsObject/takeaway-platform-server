@@ -1,0 +1,25 @@
+{
+	"include": [ //指定要编译的目录
+		"./src"
+	],
+	"compilerOptions": {
+		"outDir": "./dist",
+		"baseUrl": ".",
+		"noEmitOnError": false,
+		"paths": {
+			"@/*": [
+				"./src/*"
+			]
+		},
+		"target": "ES2018",
+		"module": "CommonJS",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"lib": [
+			"ES2018"
+		],
+		"removeComments": true,
+		"strict": true,
+	}
+}
