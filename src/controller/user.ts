@@ -9,6 +9,8 @@ const { JWTsecretKey, algorithm, tokenExpiresIn } = token;
 type Application = (req: Request, res: Response, next: NextFunction) => void;
 
 export const register: Application = (req, res, next) => {
+	// 用户注册
+	// 判断用户是否存在，不存在再创建账户
 	const { body } = req;
 	const userNameRule = /^[0-9a-z]{1,18}$/i;
 	const passWordRule = /^.{6,18}$/;
@@ -21,26 +23,44 @@ export const register: Application = (req, res, next) => {
 		return;
 	}
 	password = hashPassWord({ userName, password });
-	addUser({
-		userName: userName,
-		password: password
-	}, (err, results, fields) => {
+	userSelect({ userName, password }, (err, results, fields) => {
 		if (err) {
+			res.status(500).json({
+				status: 500,
+				msg: "服务器内部错误，无法完成请求"
+			})
+			return;
+		}
+		if (results.length !== 0) {
 			res.status(403).json({
 				status: 403,
 				msg: "用户已存在"
 			})
-		} else {
-			res.status(200).json({
-				status: 200,
-				msg: "成功"
-			})
+			return;
 		}
-	});
+		addUser({
+			userName: userName,
+			password: password
+		}, (err, results, fields) => {
+			if (err) {
+				res.status(500).json({
+					status: 500,
+					msg: "服务器内部错误，无法完成请求"
+				})
+			} else {
+				res.status(200).json({
+					status: 200,
+					msg: "用户创建成功"
+				})
+			}
+		});
+		return;
+	})
 	return;
 }
 
 export const login: Application = (req, res, next) => {
+	// 用户登录
 	const { body } = req;
 	let { userName, password } = body;
 	password = hashPassWord({ userName, password });//加密密码
@@ -60,14 +80,15 @@ export const login: Application = (req, res, next) => {
 			res.cookie("token", token, { maxAge: tokenExpiresIn });
 			res.status(200).json({
 				status: 200,
-				msg: "成功"
+				msg: "登录成功"
 			})
 		}
 		return;
-	})
+	});
 }
 
 export const changePassword: Application = (req, res, next) => {
+	// 修改密码
 	const { body } = req;
 	const { userName, password, newPassword } = body;
 	userChangePassword({ userName, password, newPassword }, (isSuccess, msg) => {
