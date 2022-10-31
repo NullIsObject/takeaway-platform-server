@@ -4,7 +4,11 @@ import { mysqlConfig } from '@/config';
 import hashPassword from "@/utils/hash-password";
 import createId from '@/utils/createId';
 
-type sqlCallBack = (error: MysqlError | null, results: any, fields: FieldInfo[] | undefined) => void;
+type SqlCallBack = (error: MysqlError | null, results: any, fields: FieldInfo[] | undefined) => void;
+type UserNamePassword = {
+	userName: string,
+	password: string
+}
 
 const pool = mysql.createPool(mysqlConfig);
 
@@ -14,25 +18,25 @@ export const query = (sql: QueryOptions | string, arr: any[], callBack: queryCal
 	})
 };
 
-export const addUser = ({ userName, password }: { userName: string, password: string }, callBack: sqlCallBack) => {
+export const addUser = ({ userName, password }: UserNamePassword, callBack: SqlCallBack) => {
 	// 添加用户
 	const id = createId(),
 		createTime = Date.now();
 	const sql =
 		`INSERT INTO user_info(id,user_name,password,create_time,update_time)
 			VALUES( ? , ? , ? , ? , ? )`;
-	password = hashPassword({ userName, password });//加密密码
+	password = hashPassword({ userName, password });
 	query(sql, [id, userName, password, createTime, createTime], callBack)
 }
-export const userSelect = ({ userName, password }: { userName: string, password: string }, callBack: queryCallback) => {
+export const userSelect = ({ userName, password }: UserNamePassword, callBack: queryCallback) => {
 	// 查询用户是否存在，根据queryCallback的results判断
 	const sql = `SELECT user_name,password FROM user_info
 	WHERE user_name = ? AND password= ?`;
-	password = hashPassword({ userName, password });//加密密码
+	password = hashPassword({ userName, password });
 	query(sql, [userName, password], callBack);
 }
 
-export const userChangePassword = ({ userName, password, newPassword }: { userName: string, password: string, newPassword: string }, callBack: (isSuccess: boolean, msg: string) => any) => {
+export const userChangePassword = ({ userName, password, newPassword }: UserNamePassword & { newPassword: string }, callBack: (isSuccess: boolean, msg: string) => any) => {
 	//修改密码，根据isSuccess参数判断是否成功
 	//!!!不要返回msg参数到客户端，该参数仅用于调试
 	userSelect({ userName, password }, (err, results, fields) => {
@@ -58,4 +62,19 @@ export const userChangePassword = ({ userName, password, newPassword }: { userNa
 			}
 		})
 	})
+}
+
+export const selectUserWallet = ({ userName }: { userName: string }, callBack: SqlCallBack) => {
+	// 查询用户钱包信息
+	const sql = `SELECT money,score,discounts FROM user_wallet w
+	JOIN user_info u ON w.id=u.id
+	WHERE user_name= ?`;
+	query(sql, [userName], callBack);
+}
+
+export const selectUserDiscounts = ({ id }: { id: string }, callBack: SqlCallBack) => {
+	// 根据id查看优惠券
+	const sql = `SELECT name,msg,indate FROM discounts
+	WHERE id= ? `;
+	query(sql, [id], callBack);
 }

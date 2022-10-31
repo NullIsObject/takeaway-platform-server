@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jsonwebtoken from "jsonwebtoken";
-import { addUser, userSelect, userChangePassword } from "@/model/index";
+import { addUser, userSelect, userChangePassword, selectUserWallet, selectUserDiscounts } from "@/model/index";
 import { token } from "@/config";
 
 const { JWTsecretKey, algorithm, tokenExpiresIn } = token;
 
-type Application = (req: Request, res: Response, next: NextFunction) => void;
+type Middleware = (req: Request, res: Response, next: NextFunction) => void;
 
-export const register: Application = (req, res, next) => {
+export const register: Middleware = (req, res, next) => {
 	// 用户注册
 	// 判断用户是否存在，不存在再创建账户
 	const { body } = req;
@@ -57,7 +57,7 @@ export const register: Application = (req, res, next) => {
 	return;
 }
 
-export const login: Application = (req, res, next) => {
+export const login: Middleware = (req, res, next) => {
 	// 用户登录
 	const { body } = req;
 	const { userName, password } = body;
@@ -73,25 +73,24 @@ export const login: Application = (req, res, next) => {
 			res.status(500).json({
 				status: 500,
 				msg: "未知错误，请重试"
-			})
+			});
 		} else if (results.length === 0) {//判断用户是否存在
 			res.status(403).json({
 				status: 403,
 				msg: "用户名或密码错误"
-			})
+			});
 		} else {
 			const token = jsonwebtoken.sign({ userName }, JWTsecretKey, { algorithm, expiresIn: tokenExpiresIn });
-			res.cookie("token", token, { maxAge: tokenExpiresIn });
-			res.status(200).json({
+			res.status(200).cookie("token", token, { maxAge: tokenExpiresIn }).json({
 				status: 200,
 				msg: "登录成功"
-			})
+			});
 		}
 		return;
 	});
 }
 
-export const changePassword: Application = (req, res, next) => {
+export const changePassword: Middleware = (req, res, next) => {
 	// 修改密码
 	const { body } = req;
 	const { userName, password, newPassword } = body;
@@ -115,4 +114,13 @@ export const changePassword: Application = (req, res, next) => {
 			})
 		}
 	})
+}
+
+export const getWallet: Middleware = (req, res, next) => {
+	// 获取用户钱包信息
+	const userToken: any = jsonwebtoken.decode(req.cookies.token);
+	const userName: string = userToken?.userName;
+	// 查询钱包信息，返回所有信息，
+	// 根据钱包信息的优惠券id获取优惠券信息返回到客户端
+	// 注意代码异步执行
 }
