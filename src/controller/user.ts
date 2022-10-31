@@ -123,4 +123,7 @@ export const getWallet: Middleware = (req, res, next) => {
 	// 查询钱包信息，返回所有信息，
 	// 根据钱包信息的优惠券id获取优惠券信息返回到客户端
 	// 注意代码异步执行
+
+
+	
 }
