@@ -2,6 +2,9 @@
 	"include": [ //指定要编译的目录
 		"./src"
 	],
+	"ts-node": {
+    "files": true
+  },
 	"compilerOptions": {
 		"outDir": "./dist",
 		"baseUrl": ".",
