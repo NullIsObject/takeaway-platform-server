@@ -35,17 +35,23 @@ export const addUser = ({ userName, password }: UserNamePassword) => {
 	return query(sql, [id, userName, password, createTime, createTime]);
 }
 
-export const userSelect = ({ userName }: UserName) => {
-	// 查询用户是否存在，根据results长度判断
-	const sql = `SELECT user_name,password FROM user_info
-	WHERE user_name = ? `;
-	return query(sql, [userName]);
+export const userSelect = ({ userName, userId }: { userName?: string, userId?: string }) => {
+	// 查询用户信息
+	if (userName) {
+		const sql = `SELECT id,user_name,name,sex,city,photo FROM user_info
+		WHERE user_name = ? `;
+		return query(sql, [userName]);
+	} else {
+		const sql = `SELECT id,user_name,name,sex,city,photo FROM user_info
+		WHERE id = ? `;
+		return query(sql, [userId]);
+	}
 }
 
 export const userVerify = ({ userName, password }: UserNamePassword) => {
 	// 验证用户密码，根据results长度判断
 	password = hashPassword({ userName, password });
-	const sql = `SELECT id,user_name,password FROM user_info
+	const sql = `SELECT id,user_name,name,sex,city,photo FROM user_info
 	WHERE user_name = ? AND password = ?`;
 	return query(sql, [userName, password]);
 }
@@ -66,10 +72,3 @@ export const selectUserWallet = ({ id }: { id: string }) => {
 	WHERE u.id= ?`;
 	return query(sql, [id]);
 }
-
-// export const selectUserDiscounts = ({ id }: { id: string }, callBack: SqlCallBack) => {
-// 	// 根据id查看优惠券
-// 	const sql = `SELECT name,msg,indate FROM discounts
-// 	WHERE id= ? `;
-// 	query(sql, [id], callBack);
-// }

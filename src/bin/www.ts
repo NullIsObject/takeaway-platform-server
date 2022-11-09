@@ -1,11 +1,10 @@
 import { AddressInfo } from 'net';
 import http from 'http';
 import moduleAlias from 'module-alias';
-import path from 'path';
+require('express-async-errors');//处理async错误
+import { moduleAliasConfig } from "../config";
 // 路径别名配置
-moduleAlias.addAliases({
-  '@': path.join(__dirname, '../')
-});
+moduleAlias.addAliases(moduleAliasConfig);
 import app from '@/app';
 import { serverConfig } from '@/config';
 /**

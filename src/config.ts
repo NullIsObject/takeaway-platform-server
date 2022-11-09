@@ -1,8 +1,13 @@
 import { PoolConfig } from 'mysql';
 import minimist from 'minimist';
 import { Algorithm } from "jsonwebtoken";
+import path from 'path';
 
 const args = minimist(process.argv.slice(2));
+//路径别名，须同时在tsconfig.json声明
+export const moduleAliasConfig = {
+	'@': path.join(__dirname, './')
+}
 // 数据库配置
 export const mysqlConfig: PoolConfig = {
 	host: 'localhost',

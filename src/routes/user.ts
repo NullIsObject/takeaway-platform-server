@@ -1,18 +1,16 @@
 import express from 'express';
-import { register, login, changePassword, getWallet } from "@/controller/user";
-import { tokenVerify, tokenContentVerify, errorMiddleWare } from "@/utils/useTokenVerify";
+import { register, login, changePassword, getWallet, getUserInfo } from "@/controller/user";
+import { tokenVerify, errorMiddleWare } from "@/utils/useTokenVerify";
 
 const router = express.Router();
-const wallet = express.Router();
 router.post('/', function (req, res, next) {
 	res.send('/user');
 });
 
-router.post('/register', register);
-router.post('/login', login);
-router.post('/password', changePassword);
-wallet.use(tokenVerify, tokenContentVerify, errorMiddleWare);//token验证
-wallet.post('/', getWallet);
-router.use('/wallet', wallet);
+router.post('/register', register);//用户注册
+router.post('/login', login);//用户登录
+router.post('/password', changePassword);//修改密码
+router.post('/wallet', tokenVerify, errorMiddleWare, getWallet);//用户钱包信息
+router.post('/info', tokenVerify, errorMiddleWare, getUserInfo);//用户信息
 
 export default router;

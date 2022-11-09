@@ -1,12 +1,10 @@
-import { Request, Response, NextFunction } from "express";
 import jsonwebtoken from "jsonwebtoken";
-// import { addUser, userSelect, userChangePassword, selectUserWallet, selectUserDiscounts } from "@/model/index";
-import { addUser, userSelect, userVerify, userChangePassword, selectUserWallet } from "@/model/index";
+import { addUser, userSelect, userVerify, userChangePassword, selectUserWallet } from "@/model";
 import { token } from "@/config";
+import getUserId from "@/utils/getUserId";
+import { Middleware } from "@/types";
 
 const { JWTsecretKey, algorithm, tokenExpiresIn } = token;
-
-type Middleware = (req: Request, res: Response, next: NextFunction) => void;
 
 export const register: Middleware = async (req, res, next) => {
 	// 用户注册
@@ -57,9 +55,17 @@ export const login: Middleware = async (req, res, next) => {
 	}
 	const { id } = userVerifyResult[0];
 	const token = jsonwebtoken.sign({ userId: id }, JWTsecretKey, { algorithm, expiresIn: tokenExpiresIn });
-	res.status(200).cookie("token", token, { maxAge: tokenExpiresIn }).json({
+	const sendData = {
+		userId: userVerifyResult[0]["id"],
+		userName: userVerifyResult[0]["user_name"],
+		sex: userVerifyResult[0]["sex"],
+		city: userVerifyResult[0]["city"],
+		photo: userVerifyResult[0]["photo"]
+	}
+	res.status(200).cookie("token", token, { maxAge: tokenExpiresIn * 1000 }).json({
 		status: 200,
-		msg: "登录成功"
+		msg: "登录成功",
+		data: sendData
 	});
 }
 
@@ -109,6 +115,30 @@ export const getWallet: Middleware = async (req, res, next) => {
 		money: selectUserWalletResult[0].money,
 		score: selectUserWalletResult[0].score,
 		discountIds
+	}
+	res.status(200).json({
+		status: 200,
+		msg: "成功",
+		data: sendData
+	});
+}
+
+export const getUserInfo: Middleware = async (req, res, next) => {
+	const userId = getUserId(req)
+	if (!userId) {
+		res.status(401).json({
+			status: 401,
+			msg: "用户身份验证失败"
+		})
+		return
+	}
+	const userInfos = await userSelect({ userId });
+	const sendData = {
+		userId: userInfos[0]["id"],
+		userName: userInfos[0]["user_name"],
+		sex: userInfos[0]["sex"],
+		city: userInfos[0]["city"],
+		photo: userInfos[0]["photo"]
 	}
 	res.status(200).json({
 		status: 200,

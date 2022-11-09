@@ -1,8 +1,8 @@
-import { Request, Response, NextFunction } from "express";
 import { expressjwt } from "express-jwt";
-import jsonwebtoken from "jsonwebtoken";
 import { token } from "@/config";
+import { ErrMiddleware, Middleware } from "@/types";
 const { JWTsecretKey, algorithm } = token;
+
 export const tokenVerify = expressjwt({
 	// 验证token是否有效
 	secret: JWTsecretKey,
@@ -12,18 +12,7 @@ export const tokenVerify = expressjwt({
 	}
 })
 
-export const tokenContentVerify = (req: Request, res: Response, next: NextFunction) => {
-	// 验证token是否包含所需信息
-	const userToken: any = jsonwebtoken.decode(req.cookies.token);
-	if (!userToken.userId) {
-		res.status(401).json({
-			status: 401,
-			msg: "用户身份验证失败"
-		})
-	} else next()
-}
-
-export const errorMiddleWare = (err: Error, req: Request, res: Response, next: NextFunction) => {
+export const errorMiddleWare: ErrMiddleware = (err, req, res, next) => {
 	// 错误处理
 	res.status(401).json({
 		status: 401,
@@ -31,4 +20,4 @@ export const errorMiddleWare = (err: Error, req: Request, res: Response, next: N
 	})
 }
 
-export default { tokenVerify, tokenContentVerify, errorMiddleWare }
+export default { tokenVerify, errorMiddleWare }
