@@ -2,6 +2,7 @@ import jsonwebtoken from "jsonwebtoken";
 import { addUser, userSelect, userVerify, userChangePassword, selectUserWallet } from "@/model";
 import { token } from "@/config";
 import getUserId from "@/utils/getUserId";
+import { requestError } from "@/utils/fixedResponse";
 import { Middleware } from "@/types";
 
 const { JWTsecretKey, algorithm, tokenExpiresIn } = token;
@@ -13,10 +14,7 @@ export const register: Middleware = async (req, res, next) => {
 	const passWordRule = /^.{6,18}$/;
 	const { userName, password } = body;
 	if (!userName || !password || !userNameRule.test(userName) || !passWordRule.test(password)) {
-		res.status(403).json({
-			status: 403,
-			msg: "用户名或密码不符合规范"
-		})
+		requestError(res)
 		return;
 	}
 	const userSelectResult = await userSelect({ userName });
@@ -39,10 +37,7 @@ export const login: Middleware = async (req, res, next) => {
 	const { body } = req;
 	const { userName, password } = body;
 	if (!userName || !password) {
-		res.status(400).json({
-			status: 400,//请求缺少所需参数
-			msg: "登录失败"
-		})
+		requestError(res)
 		return;
 	}
 	const userVerifyResult = await userVerify({ userName, password });
@@ -74,10 +69,7 @@ export const changePassword: Middleware = async (req, res, next) => {
 	const { body } = req;
 	const { userName, password, newPassword } = body;
 	if (!userName || !password || !newPassword) {
-		res.status(400).json({
-			status: 400,
-			msg: "请求缺少所需参数"
-		})
+		requestError(res)
 		return;
 	}
 	const userVerifyResult = await userVerify({ userName, password });
