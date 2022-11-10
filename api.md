@@ -59,20 +59,20 @@
 
 ## /user/wallet 用户钱包信息
 	method:post
-	status:{
+	response:{
 		status: 200,
 		msg: "成功",
 		data: {
 			userId: string,
-			money: string,
-			score: string,
+			money: number,
+			score: number,
 			discountIds: Array<string>
 		}
 	}
 
 ## /user/info 用户信息
 	method:post
-	status:{
+	response:{
 		status: 200,
 		msg: "成功",
 		data: {
@@ -87,9 +87,6 @@
 # discount
 ## /discount/coupon 优惠券信息
 	method:post
-	status:{
-		200:"成功"
-	}
 	request:{
 		"ids": Array<id>
 	}

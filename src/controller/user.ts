@@ -95,18 +95,20 @@ export const getWallet: Middleware = async (req, res, next) => {
 	const selectUserWalletResult = await selectUserWallet({ id: userId });
 	let sendData: { userId: string, money: number, score: number, discountIds: Array<string> };
 	if (!selectUserWalletResult.length) {
-		res.status(500).json({
-			status: 500,
-			msg: "服务器出错"
-		});
-		return;
-	}
-	let discountIds: Array<string> = selectUserWalletResult[0].discounts.split(';')
-	sendData = {
-		userId: userId,
-		money: selectUserWalletResult[0].money,
-		score: selectUserWalletResult[0].score,
-		discountIds
+		sendData = {
+			userId: userId,
+			money: 0,
+			score: 0,
+			discountIds: []
+		}
+	} else {
+		let discountIds: Array<string> = selectUserWalletResult[0].discounts.split(';')
+		sendData = {
+			userId: userId,
+			money: selectUserWalletResult[0].money,
+			score: selectUserWalletResult[0].score,
+			discountIds
+		}
 	}
 	res.status(200).json({
 		status: 200,

@@ -20,4 +20,4 @@ export const errorMiddleWare: ErrMiddleware = (err, req, res, next) => {
 	})
 }
 
-export default { tokenVerify, errorMiddleWare }
+export default [ tokenVerify, errorMiddleWare ]
