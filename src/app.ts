@@ -6,6 +6,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import indexRouter from './routes/index';
 import userRouter from './routes/user';
+import discountRouter from "./routes/discount";
 const app = express();
 // view模板路径和后缀设置
 app.set('views', path.join(__dirname, 'views'));
@@ -16,6 +17,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use('/', indexRouter);
 app.use('/user', userRouter);
+app.use('/discount', discountRouter);
 
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
 	res.status(500).json({

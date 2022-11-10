@@ -72,3 +72,13 @@ export const selectUserWallet = ({ id }: { id: string }) => {
 	WHERE u.id= ?`;
 	return query(sql, [id]);
 }
+
+export const selectCoupon = (idArr: Array<string>) => {
+	// 查询优惠券信息
+	let sql = `SELECT id,name,msg,indate FROM discounts
+	WHERE id= ? `
+	for (let i = 1; i < idArr.length; i++) {
+		sql += `OR ?`
+	}
+	return query(sql, idArr);
+}
