@@ -22,6 +22,7 @@
 	}
 
 ## /user/login 用户登录
+	// 用户为前端设置cookie（token字段）
 	method:post
 	status:{
 		403:"用户名或密码错误"
@@ -58,6 +59,7 @@
 	}
 
 ## /user/wallet 用户钱包信息
+	// discountIds是优惠券id，需要另外发起请求获取优惠券信息（/discount/coupon）
 	method:post
 	response:{
 		status: 200,
