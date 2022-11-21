@@ -78,7 +78,7 @@ export const selectCoupon = (idArr: Array<string>) => {
 	let sql = `SELECT id,name,msg,indate FROM discounts
 	WHERE id= ? `
 	for (let i = 1; i < idArr.length; i++) {
-		sql += `OR ?`
+		sql += `OR id= ?`
 	}
 	return query(sql, idArr);
 }

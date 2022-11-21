@@ -10,13 +10,7 @@ const { JWTsecretKey, algorithm, tokenExpiresIn } = token;
 export const register: Middleware = async (req, res, next) => {
 	// 用户注册
 	const { body } = req;
-	const userNameRule = /^[0-9a-z]{1,18}$/i;
-	const passWordRule = /^.{6,18}$/;
 	const { userName, password } = body;
-	if (!userName || !password || !userNameRule.test(userName) || !passWordRule.test(password)) {
-		requestError(res)
-		return;
-	}
 	const userSelectResult = await userSelect({ userName });
 	if (userSelectResult.length) {
 		res.status(403).json({
@@ -36,10 +30,6 @@ export const login: Middleware = async (req, res, next) => {
 	// 用户登录
 	const { body } = req;
 	const { userName, password } = body;
-	if (!userName || !password) {
-		requestError(res)
-		return;
-	}
 	const userVerifyResult = await userVerify({ userName, password });
 	if (!userVerifyResult.length) {
 		res.status(403).json({
@@ -68,10 +58,6 @@ export const changePassword: Middleware = async (req, res, next) => {
 	// 修改密码
 	const { body } = req;
 	const { userName, password, newPassword } = body;
-	if (!userName || !password || !newPassword) {
-		requestError(res)
-		return;
-	}
 	const userVerifyResult = await userVerify({ userName, password });
 	if (!userVerifyResult.length) {
 		res.status(403).json({
